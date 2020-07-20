@@ -1,8 +1,13 @@
 import Vue from "vue";
 import Router from "vue-router";
 import NProgress from "nprogress";
+import findLast from "lodash/findLast";
+import { notification } from "ant-design-vue";
+
 import "nprogress/nprogress.css";
 import NotFound from "../views/404";
+import Forbidden from "../views/403";
+import { isLogin, checkAuthority } from "../Authority/Authority";
 
 Vue.use(Router);
 
@@ -53,7 +58,7 @@ const router = new Router({
         },
         {
           path: "/dashboard",
-          meta: { icon: "dashboard", title: "仪表盘" },
+          meta: { icon: "dashboard", title: "仪表盘", authority: ["user"] },
           name: "dashboard",
           component: { render: h => h("router-view") },
           children: [
@@ -78,7 +83,7 @@ const router = new Router({
             {
               path: "/form/basic-form",
               name: "basicform",
-              meta: { title: "基础表单" },
+              meta: { title: "基础表单", authority: ["admin"] },
               component: () =>
                 import(
                   /* webpackChunkName: "form" */ "../views/Forms/BasicForm"
@@ -133,13 +138,47 @@ const router = new Router({
       name: "404",
       hideInMenu: true,
       component: NotFound
+    },
+    {
+      path: "/403",
+      name: "403",
+      hideInMenu: true,
+      component: Forbidden
     }
   ]
 });
 
+// 权限判断。如果先判断login信息则每个路由都需要判断
+// 所以先判断权限，如果不通过则判断login
+// 判断login，如果未登录，则跳转登录页面
+
 router.beforeEach((to, from, next) => {
+  console.log(to.matched);
   if (to.path !== from.path) {
     NProgress.start();
+  }
+  const record = findLast(to.matched, record => {
+    if (record.meta.authority && record.meta.authority.length) {
+      return record.meta.authority;
+    }
+  });
+  if (record && !checkAuthority(record.meta.authority)) {
+    // 未登录
+    if (!isLogin() && to.path !== "/user/login") {
+      next({
+        path: "/user/login"
+      });
+    } else if (to.path !== "/403") {
+      // 已登录 - 无权限
+      notification.error({
+        message: "403",
+        description: "你没有权限访问，请联系管理员咨询。"
+      });
+      next({
+        path: "/403"
+      });
+    }
+    NProgress.done();
   }
   next();
 });
