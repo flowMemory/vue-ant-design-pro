@@ -1,5 +1,5 @@
 // 前端的用户权限是根据用户登录后后端返回的
-
+// admin
 const getUserAuthorityList = function() {
   let authorityList = ["user", "admin"];
   return authorityList;

@@ -4,16 +4,24 @@ import router from "./router";
 import store from "./store";
 // import 'ant-design-vue/dist/antd.css';
 import { Button, Layout, Icon, Drawer, Radio, Menu } from "ant-design-vue";
+import Authorized from "./components/Authorized.vue";
+import Auth from "./directives/auth";
 
 Vue.config.productionTip = false;
 
-// 全局注册组件
+// 全局注册组件 - 第三方
 Vue.use(Button);
 Vue.use(Layout);
 Vue.use(Icon);
 Vue.use(Drawer);
 Vue.use(Radio);
 Vue.use(Menu);
+
+// 全局注册组件 - 自己的实例
+Vue.component("Authorized", Authorized);
+
+// 全局注册指令
+Vue.use(Auth);
 
 new Vue({
   router,
