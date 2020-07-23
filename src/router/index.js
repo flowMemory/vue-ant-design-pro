@@ -20,8 +20,10 @@ const router = new Router({
       hideInMenu: true,
       path: "/user",
       component: () =>
-        import(/* webpackChunkName: "layout" */ "../layouts/UserLayout"),
+        // webpackChunkName 通过标识符，让webpack打包做到分包，把相同名字的组件打包到一起
+        import(/* webpackChunkName: "user" */ "../layouts/UserLayout"),
       children: [
+        // 通过重定向路由，简化访问路径，方便用户输入地址
         {
           path: "/user",
           redirect: "/user/login"
