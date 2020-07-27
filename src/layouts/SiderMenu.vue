@@ -39,18 +39,22 @@ export default {
     "sub-menu": SubMenu
   },
   watch: {
+    // 当路由跳转的时候，根据路由path更新菜单选中的状态
     "$route.path": function(val) {
       this.selectedKeys = this.selectedKeysMap[val];
       this.openKeys = this.collapsed ? [] : this.openKeysMap[val];
     }
   },
   data() {
+    // 存储所有的path key 值
     this.selectedKeysMap = {};
     this.openKeysMap = {};
     const menuData = this.getMenuData(this.$router.options.routes);
     return {
-      // 菜单展开收起的标识位
+      // inline 时菜单是否收起状态
       collapsed: false,
+
+      // 初始化菜单数据和状态
       menuData,
       selectedKeys: this.selectedKeysMap[this.$route.path],
       openKeys: this.collapsed ? [] : this.openKeysMap[this.$route.path]
@@ -60,9 +64,12 @@ export default {
     toggleCollapsed() {
       this.collapsed = !this.collapsed;
     },
+
+    // 遍历router树结构，创建菜单数据结构
     getMenuData(routes = [], parentKeys = [], selectedKey) {
       const menuData = [];
       for (let item of routes) {
+        // 用户权限过滤
         if (
           item.meta &&
           item.meta.authority &&
@@ -70,17 +77,25 @@ export default {
         ) {
           continue;
         }
+
+        // 有name字段 且 路由没被隐藏
         if (item.name && !item.hideInMenu) {
+          // 收集所有的path
           this.openKeysMap[item.path] = parentKeys;
           this.selectedKeysMap[item.path] = [selectedKey || item.path];
+
+          // 创建菜单路由对象
           const newItem = { ...item };
           delete newItem.children;
+
+          // 有子路由信息 并且 没有隐藏子路由
           if (item.children && !item.hideChildrenInMenu) {
             newItem.children = this.getMenuData(item.children, [
               ...parentKeys,
               item.path
             ]);
           } else {
+            // 有子路由信息 并且 隐藏子路由
             this.getMenuData(
               item.children,
               selectedKey ? parentKeys : [...parentKeys, item.path],
@@ -93,6 +108,7 @@ export default {
           !item.hideChildrenInMenu &&
           item.children
         ) {
+          // 如果没有name,但是子级路由需要展示
           menuData.push(
             ...this.getMenuData(item.children, [...parentKeys, item.path])
           );
