@@ -46,7 +46,7 @@ export default {
     }
   },
   data() {
-    // 存储所有的path key 值
+    // 存储所有的path key集合的对象
     this.selectedKeysMap = {};
     this.openKeysMap = {};
     const menuData = this.getMenuData(this.$router.options.routes);
@@ -66,6 +66,12 @@ export default {
     },
 
     // 遍历router树结构，创建菜单数据结构
+    /*  
+      遍历要求：
+        1. 把所有没有hideInMenu，hideChildrenInMenu，并且拥有name字段的路由收集起来
+        2. 针对 "/" 重定向的路由，把Childen路由再次递归判断
+    */
+
     getMenuData(routes = [], parentKeys = [], selectedKey) {
       const menuData = [];
       for (let item of routes) {
@@ -90,6 +96,7 @@ export default {
 
           // 有子路由信息 并且 没有隐藏子路由
           if (item.children && !item.hideChildrenInMenu) {
+            // 子路由再次抛出执行递归
             newItem.children = this.getMenuData(item.children, [
               ...parentKeys,
               item.path
@@ -102,13 +109,15 @@ export default {
               selectedKey || item.path
             );
           }
+
+          // 处理完毕，推入menuData
           menuData.push(newItem);
         } else if (
           !item.hideInMenu &&
           !item.hideChildrenInMenu &&
           item.children
         ) {
-          // 如果没有name,但是子级路由需要展示
+          // 针对重定向的路由，如果没有name,但是子级路由需要展示，再次抛出递归
           menuData.push(
             ...this.getMenuData(item.children, [...parentKeys, item.path])
           );
