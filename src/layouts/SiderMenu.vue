@@ -23,9 +23,12 @@
 
 <script>
 /*
- * recommend SubMenu.vue https://github.com/vueComponent/ant-design-vue/blob/master/components/menu/demo/SubMenu.vue
- * SubMenu1.vue https://github.com/vueComponent/ant-design-vue/blob/master/components/menu/demo/SubMenu1.vue
- * */
+  整体的实现思路：
+    1. 为每个菜单绑定对应的路由，当发生点击行为时，触发菜单路由
+    2. watch 路由改动，然后更新selectedKeys，openKeys。同步选中的菜单和打开的菜单
+
+*/
+
 import { checkAuthority } from "../Authority/Authority";
 import SubMenu from "./SubMenu";
 export default {
@@ -96,13 +99,18 @@ export default {
 
           // 有子路由信息 并且 没有隐藏子路由
           if (item.children && !item.hideChildrenInMenu) {
+            // console.log(item)
+
             // 子路由再次抛出执行递归
             newItem.children = this.getMenuData(item.children, [
               ...parentKeys,
               item.path
             ]);
           } else {
-            // 有子路由信息 并且 隐藏子路由
+            // 有子路由信息 并且 隐藏了 子路由的子路由
+            // 这里为了把选择不同子路，但是open结果一致，都是父路由
+            // selectedKey 的初值为path ：/form/step-form
+
             this.getMenuData(
               item.children,
               selectedKey ? parentKeys : [...parentKeys, item.path],
@@ -123,7 +131,9 @@ export default {
           );
         }
       }
-      //console.log(menuData)
+      // console.log(menuData)
+      // console.log(this.openKeysMap)
+      // console.log(this.selectedKeysMap)
       return menuData;
     }
   }
