@@ -15,6 +15,7 @@
       </a-layout-sider>
       <a-layout>
         <a-layout-header style="background: #fff; padding: 0">
+          <!-- 全局vue指令的方式传入所需要的权限进行检测 -->
           <a-icon
             class="trigger"
             v-auth="['admin']"
@@ -34,7 +35,7 @@
     </a-layout>
 
     <!-- 动态修改布局组件 -->
-    <!-- 无状态 授权组件 -->
+    <!-- 无状态 授权组件 通过嵌套授权组件的方式进行页面的用户权限控制 -->
     <Authorized :authority="['admin']">
       <SettingDrawer />
     </Authorized>
