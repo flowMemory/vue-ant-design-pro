@@ -132,6 +132,23 @@ const router = new Router({
               ]
             }
           ]
+        },
+        {
+          path: "/report",
+          name: "report",
+          meta: { icon: "form", title: "报表" },
+          component: { render: h => h("router-view") },
+          children: [
+            {
+              path: "/report/amount",
+              name: "amount",
+              meta: { icon: "form", title: "财报" },
+              component: () =>
+                import(
+                  /* webpackChunkName: "form" */ "../views/reportForm/reportAmount"
+                )
+            }
+          ]
         }
       ]
     },

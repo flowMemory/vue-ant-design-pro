@@ -18,7 +18,10 @@ import {
   AutoComplete,
   Row,
   Col,
-  Checkbox
+  Checkbox,
+  Table,
+  Pagination,
+  Popconfirm
 } from "ant-design-vue";
 import Authorized from "./components/Authorized.vue";
 import Auth from "./directives/auth";
@@ -46,6 +49,9 @@ Vue.use(AutoComplete);
 Vue.use(Row);
 Vue.use(Col);
 Vue.use(Checkbox);
+Vue.use(Table);
+Vue.use(Pagination);
+Vue.use(Popconfirm);
 
 // 全局注册组件 - 自己的实例
 Vue.component("Authorized", Authorized);
